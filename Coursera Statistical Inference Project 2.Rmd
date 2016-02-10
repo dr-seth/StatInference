@@ -1,0 +1,88 @@
+---
+title: "Coursera Statistical Inference Project 2"
+author: "Seth Dobrin"
+date: "February 9, 2016"
+output: pdf_document
+---
+
+Now in the second portion of the class, we're going to analyze the ToothGrowth data in the R datasets package.
+
+Load the ToothGrowth data and perform some basic exploratory data analyses
+Provide a basic summary of the data.
+Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. (Only use the techniques from class, even if there's other approaches worth considering)
+State your conclusions and the assumptions needed for your conclusions.
+
+```{r , echo = TRUE, tidy = TRUE}
+library(knitr)
+library(ggplot2)
+```
+
+knitr settings
+```{r }
+knitr::opts_chunk$set(echo=TRUE, tidy = TRUE, message=FALSE, warnings=FALSE, fig.width=8, fig.height=5, cache=TRUE)
+```
+
+# Part 1: Load 'ToothGrowth' data and perform some exploratory analysis
+
+Load data and examine the strucure of ToothGrowth data frame
+```{r }
+data("ToothGrowth")
+str(ToothGrowth)
+```
+
+Convert dose from numeric to factor
+```{r }
+ToothGrowth$dose <- as.factor(ToothGrowth$dose)
+str(ToothGrowth)
+```
+
+Plot the data
+```{r }
+qplot(dose, len, data = ToothGrowth, facets=supp~.,color=dose, xlab = "Tooth Length (mm)", ylab = "Dose (mg/day)",main = "Scatterplot of dose vs tooth length")
+```
+
+
+#Part 2: Provide a basic summary of the data
+
+Summary statistics
+```{r }
+summary(ToothGrowth)
+```
+
+Graphically represent the summary statistics using a boxplot
+```{r }
+qplot(factor(dose), len, data = ToothGrowth, facets=supp~., geom = c("boxplot", "jitter"), fill = dose)
+```
+
+#Part3: Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. 
+Using t.test, we check if there's difference in the performance of the treatments, looking if the p value>0.05 and if the confidence interval contains 0
+```{r }
+t.test(ToothGrowth$len[ToothGrowth$supp=="OJ"], ToothGrowth$len[ToothGrowth$supp=="VC"])
+```
+The p-value of this test is not less than 0.05. Based on this we cannot reject the null hypothesis and we canot assume that the form the vitamin is delivered effect tooth growth
+
+```{r }
+t.test(ToothGrowth$len[ToothGrowth$dose==2], ToothGrowth$len[ToothGrowth$dose==1])
+```
+Since the p-value is well below 0.05, it is highly likely that there is an effect on tooth length between 1 mg and 2 mg/day of vitamin C indepent of delivery method.
+
+```{r }
+t.test(ToothGrowth$len[ToothGrowth$dose==1], ToothGrowth$len[ToothGrowth$dose==0.5], var.equal = TRUE)
+```
+Again, since the p-value is well below 0.05, it is highly likely that there is an effect on tooth length between 0.5 mg and 1 mg/day of vitamin C indepent of delivery method. 
+
+```{r }
+t.test(ToothGrowth$len[ToothGrowth$dose==0.5], ToothGrowth$len[ToothGrowth$dose==1], var.equal = TRUE)
+```
+Since the preivious two tests showed significance it is not surprising that there is a significant effect on tooth growth between 0.5 and 2 mg/day of vitamin C indepent of delivery method. 
+
+#Part4: State your conclusions and the assumptions needed for your conclusions.
+
+Our asumptions for this experiment are as follows:
+
+1. Guniea pig populations have a common vairance (var.equal=TRUE)
+2. Guniea pigs were randomly assigned a dose and treatment type allowing us to treat samples as independent.
+
+Conclusion
+
+Higher levels of vitamin C directly impact tooth growth independent of delivery method when comparing orange juice and ascorbic acid. This is demonstrated with statistical significance.
